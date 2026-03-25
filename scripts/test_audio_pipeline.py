@@ -140,13 +140,16 @@ The user speaks voice commands. Parse the intent and decide what action to take.
 
 Respond with JSON only:
 {
-  "intent": "send_slack" | "create_github_issue" | "set_reminder" | "take_note" | "answer_question" | "unknown",
+  "intent": "send_slack" | "create_github_issue" | "set_reminder" | "create_event" | "take_note" | "remember" | "search_notes" | "list_github_issues" | "list_github_prs" | "read_slack" | "answer_question" | "unknown",
   "confidence": 0.0-1.0,
   "params": {
     // For send_slack: {"channel": "...", "recipient": "...", "message": "..."}
-    // For create_github_issue: {"repo": "...", "title": "...", "body": "..."}
-    // For set_reminder: {"time": "...", "message": "..."}
-    // For take_note: {"content": "..."}
+    // For create_github_issue: {"repo": "owner/repo", "title": "...", "body": "..."}
+    // For set_reminder/create_event: {"title": "...", "date": "...", "time": "...", "duration_minutes": 30}
+    // For take_note/remember: {"content": "..."}
+    // For search_notes: {"query": "..."}
+    // For list_github_issues/list_github_prs: {"repo": "owner/repo"}
+    // For read_slack: {"channel": "..."}
     // For answer_question: {"question": "..."}
   },
   "spoken_response": "Brief confirmation to speak back to the user (1 sentence)"
@@ -191,95 +194,23 @@ def parse_intent(transcript: str) -> dict:
 
 # ─── STEP 4: EXECUTE ACTIONS ────────────────────────────────────────
 def execute_action(intent_result: dict) -> bool:
-    """Execute the parsed intent. Returns True if action succeeded."""
+    """Execute the parsed intent via the action router. Returns True if succeeded."""
+    from actions.router import route
+
     intent = intent_result.get("intent", "unknown")
     params = intent_result.get("params", {})
 
-    if intent == "send_slack":
-        return action_send_slack(params)
-    elif intent == "create_github_issue":
-        return action_create_github_issue(params)
-    elif intent == "take_note":
-        return action_take_note(params)
-    elif intent == "set_reminder":
-        print(f"  [ACTION] Reminder: {params.get('message')} at {params.get('time')}")
-        print(f"  [ACTION] (Not implemented yet — would use calendar API)")
-        return True
-    elif intent == "answer_question":
-        print(f"  [ACTION] Answering: {params.get('question')}")
-        print(f"  [ACTION] (Response already in spoken_response)")
+    print(f"  [ACTION] Routing: {intent}")
+    result = route(intent, params)
+
+    if result.get("success"):
+        print(f"  [ACTION] OK: {result.get('detail', 'Done')}")
+        if result.get("dry_run"):
+            print(f"  [ACTION] (Dry run — set API token for real execution)")
         return True
     else:
-        print(f"  [ACTION] Unknown intent: {intent}")
+        print(f"  [ACTION] FAILED: {result.get('detail', 'Unknown error')}")
         return False
-
-
-def action_send_slack(params: dict) -> bool:
-    """Send a Slack message."""
-    token = os.environ.get("SLACK_BOT_TOKEN")
-    if not token:
-        print(f"  [SLACK] Would send to #{params.get('channel', 'general')}: {params.get('message')}")
-        print(f"  [SLACK] (No SLACK_BOT_TOKEN set — dry run)")
-        return True
-
-    channel = params.get("channel", "general")
-    message = params.get("message", "")
-    recipient = params.get("recipient", "")
-    if recipient:
-        message = f"@{recipient}: {message}"
-
-    response = requests.post(
-        "https://slack.com/api/chat.postMessage",
-        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
-        json={"channel": channel, "text": message},
-    )
-
-    if response.json().get("ok"):
-        print(f"  [SLACK] Sent to #{channel}: {message}")
-        return True
-    else:
-        print(f"  [SLACK] Error: {response.json().get('error')}")
-        return False
-
-
-def action_create_github_issue(params: dict) -> bool:
-    """Create a GitHub issue."""
-    token = os.environ.get("GITHUB_TOKEN")
-    if not token:
-        print(f"  [GITHUB] Would create issue in {params.get('repo')}: {params.get('title')}")
-        print(f"  [GITHUB] (No GITHUB_TOKEN set — dry run)")
-        return True
-
-    repo = params.get("repo", "")
-    response = requests.post(
-        f"https://api.github.com/repos/{repo}/issues",
-        headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github.v3+json"},
-        json={"title": params.get("title", ""), "body": params.get("body", "")},
-    )
-
-    if response.status_code == 201:
-        url = response.json().get("html_url")
-        print(f"  [GITHUB] Created: {url}")
-        return True
-    else:
-        print(f"  [GITHUB] Error: {response.status_code} {response.text[:200]}")
-        return False
-
-
-def action_take_note(params: dict) -> bool:
-    """Save a note locally."""
-    notes_dir = os.path.join(os.path.dirname(__file__), "..", "notes")
-    os.makedirs(notes_dir, exist_ok=True)
-
-    from datetime import datetime
-    filename = datetime.now().strftime("%Y%m%d_%H%M%S") + ".txt"
-    filepath = os.path.join(notes_dir, filename)
-
-    with open(filepath, "w") as f:
-        f.write(params.get("content", ""))
-
-    print(f"  [NOTE] Saved: {filepath}")
-    return True
 
 
 # ─── STEP 5: TEXT-TO-SPEECH ─────────────────────────────────────────
