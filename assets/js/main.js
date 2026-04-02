@@ -1,11 +1,32 @@
 // ─── Navbar scroll effect ───
 const navbar = document.getElementById('navbar');
+let lastScroll = 0;
+
 window.addEventListener('scroll', () => {
   navbar.classList.toggle('scrolled', window.scrollY > 40);
+  lastScroll = window.scrollY;
 }, { passive: true });
 
+// ─── Mobile menu toggle ───
+const navToggle = document.getElementById('navToggle');
+const mobileMenu = document.getElementById('mobileMenu');
+
+navToggle.addEventListener('click', () => {
+  navToggle.classList.toggle('active');
+  mobileMenu.classList.toggle('open');
+});
+
+// Close mobile menu on link click
+mobileMenu.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    navToggle.classList.remove('active');
+    mobileMenu.classList.remove('open');
+  });
+});
+
 // ─── Scroll reveal ───
-const revealElements = document.querySelectorAll('.reveal');
+const revealEls = document.querySelectorAll('.reveal');
+
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -13,27 +34,32 @@ const revealObserver = new IntersectionObserver((entries) => {
       revealObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+}, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
 
-revealElements.forEach(el => revealObserver.observe(el));
+revealEls.forEach(el => revealObserver.observe(el));
 
-// ─── Waitlist form ───
-function handleWaitlist(e) {
-  e.preventDefault();
-  const input = e.target.querySelector('input');
-  const btn = e.target.querySelector('button');
+// ─── Terminal line stagger ───
+const terminalLines = document.querySelectorAll('.t-line');
+terminalLines.forEach((line, i) => {
+  line.style.opacity = '0';
+  line.style.transform = 'translateY(6px)';
+  line.style.transition = `opacity 0.35s ease ${i * 0.1}s, transform 0.35s ease ${i * 0.1}s`;
+});
 
-  btn.textContent = 'JOINING...';
-  btn.disabled = true;
-
-  // Simulate submission (replace with real endpoint)
-  setTimeout(() => {
-    btn.textContent = "YOU'RE IN";
-    btn.style.background = 'var(--green)';
-    input.value = '';
-    input.placeholder = 'Welcome aboard.';
-    input.disabled = true;
-  }, 800);
+const terminalEl = document.querySelector('.terminal');
+if (terminalEl) {
+  const termObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        terminalLines.forEach(line => {
+          line.style.opacity = '1';
+          line.style.transform = 'translateY(0)';
+        });
+        termObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.25 });
+  termObserver.observe(terminalEl);
 }
 
 // ─── Smooth anchor scrolling ───
@@ -43,30 +69,39 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     if (target) {
       e.preventDefault();
       target.scrollIntoView({ behavior: 'smooth' });
-      document.querySelector('nav').classList.remove('mobile-open');
     }
   });
 });
 
-// ─── Typing effect for demo ───
-const demoLines = document.querySelectorAll('.demo-line');
-demoLines.forEach((line, i) => {
-  line.style.opacity = '0';
-  line.style.transform = 'translateY(8px)';
-  line.style.transition = `opacity 0.4s ease ${i * 0.15}s, transform 0.4s ease ${i * 0.15}s`;
-});
+// ─── Waitlist form ───
+const waitlistForm = document.getElementById('waitlistForm');
+if (waitlistForm) {
+  waitlistForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const input = this.querySelector('input');
+    const btn = this.querySelector('button span:first-child');
 
-const demoObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      demoLines.forEach(line => {
-        line.style.opacity = '1';
-        line.style.transform = 'translateY(0)';
-      });
-      demoObserver.unobserve(entry.target);
-    }
+    btn.textContent = 'Joining...';
+
+    setTimeout(() => {
+      btn.textContent = "You're in";
+      this.querySelector('button').style.background = 'var(--green)';
+      input.value = '';
+      input.placeholder = 'Welcome aboard.';
+      input.disabled = true;
+      this.querySelector('button').disabled = true;
+    }, 800);
   });
-}, { threshold: 0.3 });
+}
 
-const demoEl = document.querySelector('.command-demo');
-if (demoEl) demoObserver.observe(demoEl);
+// ─── Device SVG subtle parallax on scroll ───
+const deviceWrapper = document.getElementById('deviceWrapper');
+if (deviceWrapper) {
+  window.addEventListener('scroll', () => {
+    const rect = deviceWrapper.getBoundingClientRect();
+    const center = rect.top + rect.height / 2;
+    const viewCenter = window.innerHeight / 2;
+    const offset = (center - viewCenter) / window.innerHeight;
+    deviceWrapper.style.transform = `translateY(${offset * -12}px)`;
+  }, { passive: true });
+}
