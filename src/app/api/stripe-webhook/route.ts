@@ -13,7 +13,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing signature" }, { status: 401 });
     }
 
-    const event = getStripe().webhooks.constructEvent(
+    const stripe = getStripe();
+    const event = stripe.webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!,
@@ -65,12 +66,42 @@ export async function POST(request: Request) {
     }
 
     if (entry) {
+      // Get receipt URL from the payment intent
+      let receiptUrl: string | undefined;
+      if (session.payment_intent) {
+        const pi = await stripe.paymentIntents.retrieve(
+          session.payment_intent as string,
+          { expand: ["latest_charge"] },
+        );
+        const charge = pi.latest_charge;
+        if (charge && typeof charge !== "string") {
+          receiptUrl = charge.receipt_url ?? undefined;
+        }
+      }
+
+      const amountTotal = session.amount_total ?? 5000;
+      const currency = (session.currency ?? "usd").toUpperCase();
+      const amountFormatted = `$${(amountTotal / 100).toFixed(2)}`;
+      const date = new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+
       const firstName = entry.name.split(" ")[0];
       await getResend().emails.send({
         from: "Ordo <hello@ordospaces.com>",
         to: entry.email,
-        subject: `Pre-order confirmed, ${firstName}!`,
-        html: preorderConfirmEmailHtml(firstName),
+        subject: `Pre-order confirmed — Ordo #${session.id.slice(-8).toUpperCase()}`,
+        html: preorderConfirmEmailHtml({
+          firstName,
+          email: entry.email,
+          amount: amountFormatted,
+          currency,
+          paymentId: session.id.slice(-8).toUpperCase(),
+          date,
+          receiptUrl,
+        }),
       });
     }
 
