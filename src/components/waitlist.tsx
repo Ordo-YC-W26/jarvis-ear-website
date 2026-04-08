@@ -95,7 +95,7 @@ export function Waitlist() {
                 disabled={loading}
                 className="preorder-btn waitlist-btn relative w-full overflow-hidden rounded-xl bg-accent px-8 py-4 text-[15px] font-semibold text-white transition-[box-shadow,transform,opacity] duration-300 cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
               >
-                <span>{loading ? "Redirecting to checkout..." : "Pre-order for $80"}</span>
+                <span>{loading ? "Redirecting to checkout..." : "Pre-order for $50"}</span>
                 <span className="btn-shimmer" aria-hidden="true" />
               </button>
               {error && <p className="min-h-[18px] text-center font-mono text-xs text-[#f87171]" aria-live="polite">{error}</p>}

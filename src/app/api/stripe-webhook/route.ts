@@ -38,7 +38,7 @@ export async function POST(request: Request) {
         .update({
           paid: true,
           stripe_session_id: session.id,
-          amount_paid: session.amount_total ?? 8000,
+          amount_paid: session.amount_total ?? 5000,
         })
         .eq("id", waitlistId)
         .select("name, email")
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
         .update({
           paid: true,
           stripe_session_id: session.id,
-          amount_paid: session.amount_total ?? 8000,
+          amount_paid: session.amount_total ?? 5000,
         })
         .eq("email", customerEmail)
         .eq("paid", false)

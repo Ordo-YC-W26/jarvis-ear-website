@@ -48,7 +48,7 @@ export async function POST(request: Request) {
               description:
                 "AI-powered behind-ear wearable with camera. Early access pre-order.",
             },
-            unit_amount: 8000,
+            unit_amount: 5000,
           },
           quantity: 1,
         },

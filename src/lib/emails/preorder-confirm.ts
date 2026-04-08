@@ -49,7 +49,7 @@ export function preorderConfirmEmailHtml(firstName: string): string {
                 </tr>
                 <tr>
                   <td style="padding:8px 0;font-size:14px;color:#908882;border-top:1px solid #1c1c1c;">Amount</td>
-                  <td style="padding:8px 0;font-size:14px;color:#e8a87c;text-align:right;border-top:1px solid #1c1c1c;">$80.00 USD</td>
+                  <td style="padding:8px 0;font-size:14px;color:#e8a87c;text-align:right;border-top:1px solid #1c1c1c;">$50.00 USD</td>
                 </tr>
                 <tr>
                   <td style="padding:8px 0;font-size:14px;color:#908882;border-top:1px solid #1c1c1c;">Status</td>
