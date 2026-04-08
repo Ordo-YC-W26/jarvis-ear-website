@@ -41,7 +41,7 @@ export function Nav() {
             href="#waitlist"
             className="nav-cta relative hidden overflow-hidden rounded-full bg-accent px-6 py-2.5 text-[13px] font-semibold text-white no-underline transition-transform hover:-translate-y-px hover:shadow-[0_4px_24px_var(--accent-glow)] sm:inline-flex"
           >
-            <span>Join Waitlist</span>
+            <span>Pre-order Now</span>
             <span className="nav-cta-shimmer" aria-hidden="true" />
           </a>
 
@@ -65,7 +65,7 @@ export function Nav() {
         <a href="#features" onClick={closeMenu} className="font-serif text-2xl text-text-2 no-underline transition-colors hover:text-text">Features</a>
         <a href="#how-it-works" onClick={closeMenu} className="font-serif text-2xl text-text-2 no-underline transition-colors hover:text-text">How it works</a>
         <a href="#use-cases" onClick={closeMenu} className="font-serif text-2xl text-text-2 no-underline transition-colors hover:text-text">Use cases</a>
-        <a href="#waitlist" onClick={closeMenu} className="inline-block rounded-full bg-accent px-7 py-3.5 text-center text-[15px] font-semibold text-white no-underline">Join Waitlist</a>
+        <a href="#waitlist" onClick={closeMenu} className="inline-block rounded-full bg-accent px-7 py-3.5 text-center text-[15px] font-semibold text-white no-underline">Pre-order Now</a>
       </div>
     </>
   );

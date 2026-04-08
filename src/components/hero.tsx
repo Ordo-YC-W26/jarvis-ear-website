@@ -36,7 +36,7 @@ export function Hero() {
 
           <div className="anim-in flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-5" style={{ "--delay": "0.3s" } as React.CSSProperties}>
             <a href="#waitlist" className="btn-primary inline-flex items-center rounded-full bg-accent px-9 py-4 text-[15px] font-semibold text-white no-underline">
-              <span>Join Waitlist</span>
+              <span>Pre-order Now</span>
               <span className="btn-shimmer" aria-hidden="true" />
             </a>
             <a href="#how-it-works" className="btn-ghost relative p-4 pl-2 text-[15px] font-medium text-text-2 no-underline transition-colors hover:text-text">
