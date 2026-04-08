@@ -1,14 +1,23 @@
+import { Hero } from "@/components/hero";
+import { SocialProof } from "@/components/social-proof";
+import { Features } from "@/components/features";
+import { LifestyleBreak } from "@/components/lifestyle-break";
+import { HowItWorks } from "@/components/how-it-works";
+import { UseCases } from "@/components/use-cases";
+import { Mission } from "@/components/mission";
+import { Waitlist } from "@/components/waitlist";
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-bg">
-      <div className="text-center">
-        <h1 className="font-serif text-5xl text-text mb-4">
-          <em className="text-accent">Ordo</em>
-        </h1>
-        <p className="font-mono text-sm text-text-3 tracking-widest uppercase">
-          Migration in progress
-        </p>
-      </div>
-    </main>
+    <>
+      <Hero />
+      <SocialProof />
+      <Features />
+      <LifestyleBreak />
+      <HowItWorks />
+      <UseCases />
+      <Mission />
+      <Waitlist />
+    </>
   );
 }

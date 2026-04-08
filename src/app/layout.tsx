@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Instrument_Sans, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Nav } from "@/components/nav";
+import { Footer } from "@/components/footer";
 import "./globals.css";
 
 const instrumentSans = Instrument_Sans({
@@ -108,9 +110,10 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
-        {/* Film grain overlay */}
         <div className="grain" aria-hidden="true" />
+        <Nav />
         {children}
+        <Footer />
         <Analytics />
         <SpeedInsights />
       </body>
