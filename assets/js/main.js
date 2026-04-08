@@ -117,9 +117,40 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
-// ─── Waitlist form — Supabase Edge Function + Resend Email ───
+// ─── Waitlist + Pre-order flow ───
 const SUPABASE_URL = 'https://mynmpjnecxseeaqkurjy.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15bm1wam5lY3hzZWVhcWt1cmp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODM0MzQsImV4cCI6MjA5MTE1OTQzNH0.Khfb2ycvnm4Sjbfx8rukg1M9DYgFxFOU34j2BkZearA';
+
+// Check for payment return
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('payment') === 'success') {
+  const waitlistSection = document.getElementById('waitlist');
+  if (waitlistSection) {
+    const inner = waitlistSection.querySelector('.waitlist-inner');
+    const form = document.getElementById('waitlistForm');
+    const preorder = document.getElementById('preorderStep');
+    const note = document.getElementById('waitlistNote');
+    if (form) form.style.display = 'none';
+    if (preorder) preorder.style.display = 'none';
+    if (note) note.style.display = 'none';
+
+    const successMsg = document.createElement('div');
+    successMsg.className = 'preorder-step';
+    successMsg.style.display = 'block';
+    successMsg.innerHTML = `
+      <p class="preorder-msg" style="color:var(--green);">Pre-order confirmed!</p>
+      <p style="font-size:16px;color:var(--text-2);line-height:1.7;">
+        Check your email for the confirmation. We'll keep you updated on development milestones.
+      </p>
+    `;
+    inner.appendChild(successMsg);
+
+    // Clean URL
+    history.replaceState({}, '', window.location.pathname);
+  }
+}
+
+let savedEmail = '';
 
 const waitlistForm = document.getElementById('waitlistForm');
 if (waitlistForm) {
@@ -135,6 +166,8 @@ if (waitlistForm) {
     btn.disabled = true;
     btnText.textContent = 'Joining...';
 
+    savedEmail = emailInput.value.trim().toLowerCase();
+
     try {
       const res = await fetch(`${SUPABASE_URL}/functions/v1/waitlist-signup`, {
         method: 'POST',
@@ -144,19 +177,17 @@ if (waitlistForm) {
         },
         body: JSON.stringify({
           name: nameInput.value.trim(),
-          email: emailInput.value.trim().toLowerCase()
+          email: savedEmail
         })
       });
 
       const data = await res.json();
 
       if (res.ok && data.success) {
-        btnText.textContent = "You're in! Check your email";
-        btn.classList.add('waitlist-success');
-        nameInput.value = '';
-        emailInput.value = '';
-        nameInput.disabled = true;
-        emailInput.disabled = true;
+        // Hide form, show pre-order step
+        waitlistForm.style.display = 'none';
+        document.getElementById('waitlistNote').style.display = 'none';
+        document.getElementById('preorderStep').style.display = 'block';
       } else {
         errorEl.textContent = data.error || 'Something went wrong. Please try again.';
         btn.disabled = false;
@@ -166,6 +197,41 @@ if (waitlistForm) {
       errorEl.textContent = 'Network error. Please try again.';
       btn.disabled = false;
       btnText.textContent = 'Join Waitlist';
+    }
+  });
+}
+
+// Pre-order button → Stripe Checkout
+const preorderBtn = document.getElementById('preorderBtn');
+if (preorderBtn) {
+  preorderBtn.addEventListener('click', async function() {
+    const btnText = this.querySelector('span:first-child');
+    this.disabled = true;
+    btnText.textContent = 'Redirecting to checkout...';
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: savedEmail })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+      } else {
+        btnText.textContent = data.error || 'Something went wrong';
+        this.disabled = false;
+        setTimeout(() => { btnText.textContent = 'Pre-order for $80'; }, 3000);
+      }
+    } catch (err) {
+      btnText.textContent = 'Network error. Try again.';
+      this.disabled = false;
+      setTimeout(() => { btnText.textContent = 'Pre-order for $80'; }, 3000);
     }
   });
 }

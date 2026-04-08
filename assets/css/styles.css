@@ -1220,6 +1220,26 @@ nav.scrolled {
   background: var(--green) !important;
 }
 
+.preorder-step {
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.preorder-msg {
+  font-family: var(--serif);
+  font-size: 20px;
+  color: var(--text);
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.preorder-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright)) !important;
+  font-size: 16px !important;
+  padding: 18px 36px !important;
+}
+
 .waitlist-note {
   font-family: var(--mono);
   font-size: 11px;
