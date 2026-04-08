@@ -28,6 +28,7 @@ export function Footer() {
               { label: "Contact", href: "mailto:hello@ordospaces.com" },
               { label: "Privacy", href: "/privacy" },
               { label: "Terms", href: "/terms" },
+              { label: "Refund Policy", href: "/refund" },
             ]} />
           </div>
         </div>
