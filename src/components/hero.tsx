@@ -69,8 +69,6 @@ export function Hero() {
             <Stat value="2" unit="MP" label="Camera" />
             <StatDivider />
             <Stat value="8" unit="hr" label="Battery" />
-            <StatDivider />
-            <Stat value="<$25" label="BOM Cost" />
           </div>
         </div>
       </div>

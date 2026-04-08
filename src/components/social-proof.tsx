@@ -2,8 +2,6 @@ export function SocialProof() {
   return (
     <section className="relative z-[1] border-b border-border bg-bg py-5" aria-label="Social proof">
       <div className="flex flex-wrap items-center justify-center gap-2 px-4">
-        <ProofItem icon="monitor" label="ESP32-S3 Powered" />
-        <ProofSep />
         <ProofItem icon="eye" label="Camera Vision AI" />
         <ProofSep />
         <ProofItem icon="shield" label="Privacy-First" />

@@ -63,7 +63,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ url: session.url });
   } catch (err) {
-    console.error("Checkout error:", err);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("Checkout error:", message);
     return NextResponse.json(
       { error: "Payment setup failed. Please try again." },
       { status: 500 },
