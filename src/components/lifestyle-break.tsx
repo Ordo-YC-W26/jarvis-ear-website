@@ -3,14 +3,8 @@
 import { useRef, useEffect } from "react";
 
 export function LifestyleBreak() {
-  const bgRef = useRef<HTMLDivElement>(null);
-  const sectionRef = useRef<HTMLElement>(null);
   const wordsRef = useRef<HTMLParagraphElement>(null);
 
-  // bgRef kept for potential future parallax
-  void bgRef;
-
-  // Word-by-word reveal
   useEffect(() => {
     const el = wordsRef.current;
     if (!el) return;
@@ -55,11 +49,10 @@ export function LifestyleBreak() {
 
   return (
     <section
-      ref={sectionRef}
       className="relative flex items-center justify-center overflow-hidden py-24 lg:py-32"
       aria-label="Brand statement"
     >
-      <div ref={bgRef} className="absolute inset-0 bg-bg-elevated" aria-hidden="true" />
+      <div className="absolute inset-0 bg-bg-elevated" aria-hidden="true" />
       <div className="relative z-[1] max-w-[700px] px-10 text-center">
         <p
           ref={wordsRef}
